@@ -25,39 +25,39 @@ namespace RepositoryPatternWithUOW.EF.Repositories
             return await _context.Set<T>().FindAsync(id);
         }
 
-        public async Task<T> FindAsync(Expression<Func<T, bool>> match)
+        public async Task<T> FindAsync(Expression<Func<T, bool>> criteria)
         {
-            return await _context.Set<T>().FirstOrDefaultAsync(match);
+            return await _context.Set<T>().FirstOrDefaultAsync(criteria);
         }
 
-        public async Task<T> FindAsync(Expression<Func<T, bool>> match, string[] includes = null)
-        {
-            IQueryable<T> query = _context.Set<T>();
-            if (includes != null)
-                foreach (var item in includes)
-                    query = query.Include(item);
-            return await query.FirstOrDefaultAsync(match);
-        }
-
-        public async Task<IEnumerable<T>> FindAllAsync(Expression<Func<T, bool>> match, string[] includes = null)
+        public async Task<T> FindAsync(Expression<Func<T, bool>> criteria, string[] includes = null)
         {
             IQueryable<T> query = _context.Set<T>();
             if (includes != null)
                 foreach (var item in includes)
                     query = query.Include(item);
-
-            return await query.Where(match).ToListAsync();
+            return await query.FirstOrDefaultAsync(criteria);
         }
 
-        public async Task<IEnumerable<T>> FindAllAsync(Expression<Func<T, bool>> match, string[] includes, int take, int skip)
+        public async Task<IEnumerable<T>> FindAllAsync(Expression<Func<T, bool>> criteria, string[] includes = null)
         {
-            return await _context.Set<T>().Where(match).Skip(skip).Take(take).ToListAsync(); ;
+            IQueryable<T> query = _context.Set<T>();
+            if (includes != null)
+                foreach (var item in includes)
+                    query = query.Include(item);
+
+            return await query.Where(criteria).ToListAsync();
         }
 
-        public async Task<IEnumerable<T>> FindAllAsync(Expression<Func<T, bool>> match, string[] includes, int? take, int? skip,
+        public async Task<IEnumerable<T>> FindAllAsync(Expression<Func<T, bool>> criteria, string[] includes, int take, int skip)
+        {
+            return await _context.Set<T>().Where(criteria).Skip(skip).Take(take).ToListAsync(); ;
+        }
+
+        public async Task<IEnumerable<T>> FindAllAsync(Expression<Func<T, bool>> criteria, string[] includes, int? take, int? skip,
             Expression<Func<T, object>> orderBy = null, string orderDirection = OrderBy.Ascending)
         {
-            IQueryable<T> query = _context.Set<T>().Where(match);
+            IQueryable<T> query = _context.Set<T>().Where(criteria);
 
             if (skip.HasValue) query = query.Skip(skip.Value);
 
@@ -75,15 +75,54 @@ namespace RepositoryPatternWithUOW.EF.Repositories
         public async Task<T> AddAsync(T entity)
         {
             await _context.Set<T>().AddAsync(entity);
-            await _context.SaveChangesAsync();
             return entity;
         }
 
         public async Task<IEnumerable<T>> AddRangeAsync(IEnumerable<T> entities)
         {
             await _context.Set<T>().AddRangeAsync(entities);
-            await _context.SaveChangesAsync();
             return entities;
+        }
+
+        public T Update(T entity)
+        {
+            _context.Set<T>().Update(entity);
+            return entity;
+        }
+
+        public IEnumerable<T> UpdateRange(IEnumerable<T> entities)
+        {
+            _context.Set<T>().UpdateRange(entities);
+            return entities;
+        }
+
+        public void Delete(T entity)
+        {
+            _context.Set<T>().Remove(entity);
+        }
+
+        public void DeleteRange(IEnumerable<T> entities)
+        {
+            _context.Set<T>().RemoveRange(entities);
+        }
+
+        public void Attach(T entity)
+        {
+            _context.Set<T>().Attach(entity);
+        }
+        public void AttachRange(IEnumerable<T> entities)
+        {
+            _context.Set<T>().AttachRange(entities);
+        }
+
+        public async Task<int> Count()
+        {
+            return await _context.Set<T>().CountAsync();
+        }
+
+        public async Task<int> Count(Expression<Func<T, bool>> criteria)
+        {
+            return await _context.Set<T>().CountAsync(criteria);
         }
     }
 }

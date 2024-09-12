@@ -3,7 +3,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using RepositoryPatternWithUOW.Core.Interfaces;
 using RepositoryPatternWithUOW.EF.Contexts;
-using RepositoryPatternWithUOW.EF.Repositories;
+using RepositoryPatternWithUOW.EF.UnitOfWorks;
 
 namespace RepositoryPatternWithUOW.EF
 {
@@ -16,7 +16,8 @@ namespace RepositoryPatternWithUOW.EF
                 b => b.MigrationsAssembly(typeof(ApplicationDbContext).Assembly.FullName))
             );
 
-            services.AddTransient(typeof(IBaseRepository<>), typeof(BaseRepository<>));
+            //services.AddTransient(typeof(IBaseRepository<>), typeof(BaseRepository<>));
+            services.AddTransient<IUnitOfWork, UnitOfWork>();
 
             return services;
         }

@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using RepositoryPatternWithUOW.Core.Interfaces;
-using RepositoryPatternWithUOW.Core.Models;
 
 namespace RepositoryPatternWithUOW.Api.Controllers
 {
@@ -8,23 +7,23 @@ namespace RepositoryPatternWithUOW.Api.Controllers
     [ApiController]
     public class AuthorsController : ControllerBase
     {
-        private readonly IBaseRepository<Author> _authorRepository;
-        public AuthorsController(IBaseRepository<Author> authorRepository)
+        private readonly IUnitOfWork _unitOfWork;
+        public AuthorsController(IUnitOfWork unitOfWork)
         {
-            _authorRepository = authorRepository;
+            _unitOfWork = unitOfWork;
         }
 
         [HttpGet]
         public async Task<IActionResult> GetAuthors()
         {
-            var authors = await _authorRepository.GetAllAsync();
+            var authors = await _unitOfWork.Authors.GetAllAsync();
             return Ok(authors);
         }
 
         [HttpGet("{id}")]
         public async Task<IActionResult> GetAuthorById(int id)
         {
-            var author = await _authorRepository.GetByIdAsync(id);
+            var author = await _unitOfWork.Authors.GetByIdAsync(id);
             return Ok(author);
         }
 
