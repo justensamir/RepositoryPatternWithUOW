@@ -15,11 +15,18 @@ namespace RepositoryPatternWithUOW.Api.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Get()
+        public async Task<IActionResult> GetAuthors()
         {
-            var author = await _authorRepository.GetById(1);
-            return Ok(author);
-
+            var authors = await _authorRepository.GetAllAsync();
+            return Ok(authors);
         }
+
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetAuthorById(int id)
+        {
+            var author = await _authorRepository.GetByIdAsync(id);
+            return Ok(author);
+        }
+
     }
 }
